@@ -10,6 +10,7 @@ const menuOpen = ref(false);
 const editingId = ref(null);
 const editingName = ref('');
 const renameInput = ref(null);
+const importInput = ref(null);
 
 function toggleMenu() { menuOpen.value = !menuOpen.value; }
 function closeMenu() { menuOpen.value = false; editingId.value = null; }
@@ -56,6 +57,25 @@ function deleteProject(id) {
   if (pm.projectOrder.length <= 1) return;
   emit('delete-project', id);
   closeMenu();
+}
+
+function exportProject(id) {
+  pm.exportProject(id);
+}
+
+async function handleImport(e) {
+  const file = e.target.files?.[0];
+  if (!file) return;
+  const newId = await pm.importProject(file);
+  if (newId) {
+    emit('switch-project', newId);
+    closeMenu();
+  }
+  if (importInput.value) importInput.value.value = '';
+}
+
+function triggerImport() {
+  importInput.value?.click();
 }
 
 function onMenuBlur() {
@@ -105,6 +125,9 @@ function onMenuBlur() {
               <button class="pm-act" @click.stop="duplicate(proj.id)" title="Duplicate">
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
               </button>
+              <button class="pm-act" @click.stop="exportProject(proj.id)" title="Export">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              </button>
               <button
                 v-if="pm.projectOrder.length > 1"
                 class="pm-act pm-act-danger"
@@ -118,10 +141,23 @@ function onMenuBlur() {
         </div>
       </div>
       <div class="pm-divider"></div>
-      <button class="pm-new" @click="createNew">
-        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 1v10M1 6h10"/></svg>
-        New Project
-      </button>
+      <div class="pm-bottom-actions">
+        <button class="pm-new" @click="createNew">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 1v10M1 6h10"/></svg>
+          New Project
+        </button>
+        <button class="pm-import" @click="triggerImport">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          Import Project
+        </button>
+      </div>
+      <input
+        ref="importInput"
+        type="file"
+        accept=".json"
+        style="display:none"
+        @change="handleImport"
+      >
     </div>
   </div>
 </template>
@@ -267,7 +303,14 @@ function onMenuBlur() {
   margin: 3px 6px;
 }
 
-.pm-new {
+.pm-bottom-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.pm-new,
+.pm-import {
   display: flex;
   align-items: center;
   gap: 7px;
@@ -283,5 +326,6 @@ function onMenuBlur() {
   cursor: pointer;
   transition: background 0.1s;
 }
-.pm-new:hover { background: rgba(99,102,241,0.08); }
+.pm-new:hover,
+.pm-import:hover { background: rgba(99,102,241,0.08); }
 </style>

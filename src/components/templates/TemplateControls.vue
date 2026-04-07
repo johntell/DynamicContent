@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue';
 import { useTemplateBuilderStore } from '../../stores/templateBuilder.js';
 import FocalPointPicker from './FocalPointPicker.vue';
+import BulkDataPanel from './BulkDataPanel.vue';
 
 const store = useTemplateBuilderStore();
 
@@ -11,7 +12,7 @@ const props = defineProps({
 });
 
 const emit = defineEmits([
-  'load-source', 'clear-logo', 'export-all', 'switch-asset',
+  'load-source', 'clear-logo', 'export-all', 'switch-asset', 'export-bulk',
 ]);
 
 // Add-layer menu
@@ -212,6 +213,12 @@ function onAddMenuBlur() { setTimeout(() => { showAddMenu.value = false; }, 150)
             </button>
           </div>
         </div>
+      </div>
+
+      <!-- ─── Bulk Data ────────────────────────────────────────────── -->
+      <div class="ctrl-sub-label">BULK DATA</div>
+      <div class="ctrl-body-section">
+        <BulkDataPanel @export-bulk="$emit('export-bulk')" />
       </div>
 
       <!-- ─── Logo ───────────────────────────────────────────────── -->

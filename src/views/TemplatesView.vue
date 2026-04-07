@@ -2,6 +2,8 @@
 import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue';
 import { useTemplateBuilderStore } from '../stores/templateBuilder.js';
 import { useProjectManagerStore } from '../stores/projectManager.js';
+import { useBulkDataStore } from '../stores/bulkData.js';
+import { useBulkExport } from '../composables/useBulkExport.js';
 import { buildSmartCropUrl, detectInterference } from '../composables/useTemplateRenderer.js';
 import { loadTemplateFonts } from '../composables/useGoogleFonts.js';
 import { useSourceLoader } from '../composables/useSourceLoader.js';
@@ -16,8 +18,9 @@ import FormatSwitcher from '../components/templates/FormatSwitcher.vue';
 
 // ── Stores ──────────────────────────────────────────────────────────────────
 
-const store   = useTemplateBuilderStore();
-const pm      = useProjectManagerStore();
+const store     = useTemplateBuilderStore();
+const pm        = useProjectManagerStore();
+const bulkStore = useBulkDataStore();
 
 // ── Canvas ref management ───────────────────────────────────────────────────
 
@@ -79,12 +82,19 @@ function resolvedFormat(fmt) {
   return { ...fmt, anchor };
 }
 
-// Draw state merges store's drawState with DOM elements
-const drawState = computed(() => ({
-  ...store.drawState,
-  el: sourceEl.value,
-  logo: logoEl.value,
-}));
+// Draw state merges store's drawState with DOM elements,
+// and applies bulk row overrides when active
+const drawState = computed(() => {
+  const base = {
+    ...store.drawState,
+    el: sourceEl.value,
+    logo: logoEl.value,
+  };
+  if (bulkStore.isActive) {
+    return bulkStore.buildRowDrawState(bulkStore.activeRowIndex, base);
+  }
+  return base;
+});
 
 const exporter = useTemplateExport(store, {
   drawState,
@@ -95,6 +105,8 @@ const exporter = useTemplateExport(store, {
   sourceReady,
   canvasRefs,
 });
+
+const bulkExporter = useBulkExport(store, bulkStore, { drawState, croppedEls, logoEl, sourceEl });
 
 // ── Source loading orchestration ────────────────────────────────────────────
 
@@ -476,6 +488,7 @@ onUnmounted(() => {
         @clear-logo="logo.clearLogo"
         @export-all="exporter.exportAll"
         @switch-asset="onSwitchAsset"
+        @export-bulk="bulkExporter.exportAllRows"
       />
     </div>
 

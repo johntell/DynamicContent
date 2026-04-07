@@ -245,11 +245,69 @@ export const useProjectManagerStore = defineStore('projectManager', () => {
     }
   }
 
+  // ── Import / Export ────────────────────────────────────────────
+
+  /** Export a project as a downloadable JSON file */
+  function exportProject(id) {
+    const p = projects.value[id];
+    if (!p) return;
+    const payload = {
+      _type: 'dynamic_content_project',
+      _version: 1,
+      name: p.name,
+      exportedAt: new Date().toISOString(),
+      snapshot: p.snapshot,
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = Object.assign(document.createElement('a'), {
+      href: url,
+      download: `${p.name.replace(/[^a-zA-Z0-9_ -]/g, '_')}.json`,
+    });
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 10_000);
+  }
+
+  /**
+   * Import a project from a JSON file.
+   * @param {File} file
+   * @returns {Promise<string|null>} the new project ID, or null on failure
+   */
+  async function importProject(file) {
+    try {
+      const text = await file.text();
+      const data = JSON.parse(text);
+
+      // Validate structure
+      if (data._type !== 'dynamic_content_project' || !data.snapshot) {
+        throw new Error('Invalid project file');
+      }
+
+      const id = generateId();
+      const name = data.name || file.name.replace(/\.json$/i, '') || 'Imported Project';
+      projects.value[id] = {
+        id,
+        name,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        snapshot: data.snapshot,
+      };
+      projectOrder.value.push(id);
+      scheduleSave();
+      return id;
+    } catch {
+      return null;
+    }
+  }
+
   return {
     projects, activeProjectId, projectOrder,
     activeProject, projectList,
     init, saveProjectSnapshot, getProjectSnapshot,
     createProject, deleteProject, renameProject, duplicateProject,
     setActiveProject, scheduleSave,
+    exportProject, importProject,
   };
 });
