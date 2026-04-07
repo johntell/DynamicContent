@@ -25,9 +25,24 @@ Paste an image URL, add text layers (headline, body, CTA), and the app renders y
 - **Logo overlay** — add a logo image with per-format sizing and anchor
 - **Global styles** — background (solid, linear, radial gradients), overlay colour/opacity, CTA button styling
 - **Multi-project** — create, rename, duplicate, and switch between independent projects
-- **Export** — download individual PNGs or all formats as a ZIP
+- **Project import/export** — share project defaults with colleagues as `.json` files
+- **Bulk data (CSV/XLSX)** — import a spreadsheet, map columns to layers, preview each row across all formats, and bulk export as a ZIP
+- **Export** — download individual PNGs, all formats as a ZIP, or bulk export rows × formats
 - **Context menu** — right-click formats to copy, paste, or duplicate with all settings
 - **Interference detection** — warns when text overlaps the focal area and suggests anchor fixes
+
+## Bulk data workflow
+
+1. Create your template with layers (headline, text, CTA) and formats
+2. Open the **Bulk Data** section in the left panel
+3. Drop a CSV or XLSX file — columns auto-map to matching layers
+4. Adjust mappings if needed; optionally map source image and logo columns
+5. Step through rows to preview each variation across all formats
+6. Click **Export All** to generate a ZIP with per-row folders containing PNGs for every format
+
+## Project sharing
+
+Export any project as a `.json` file from the project switcher dropdown, then share it with colleagues who can import it into their own instance.
 
 ## Project structure
 
@@ -35,9 +50,9 @@ Paste an image URL, add text layers (headline, body, CTA), and the app renders y
 src/
   views/            TemplatesView.vue — main orchestrator
   components/
-    templates/      UI panels (controls, canvas, format properties, styles)
-  composables/      Rendering engine, canvas interaction, font loading, export
-  stores/           Pinia stores (template state, project manager)
+    templates/      UI panels (controls, canvas, bulk data, format properties, styles)
+  composables/      Rendering engine, canvas interaction, font loading, export, spreadsheet parsing
+  stores/           Pinia stores (template state, project manager, bulk data)
   css/              Global variables and reset
 ```
 
@@ -48,6 +63,7 @@ src/
 - **Vite** for dev server and build
 - **Canvas API** for rendering (no external drawing libs)
 - **JSZip** for multi-format ZIP export
+- **SheetJS (xlsx)** for CSV/XLSX spreadsheet parsing
 - **Google Fonts** loaded on demand
 
 ## How data is stored
