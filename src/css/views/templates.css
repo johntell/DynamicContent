@@ -1,0 +1,6 @@
+/* ════════════════════════════════════════════════════════════════════════════
+   DYNAMIC CONTENT (TEMPLATES) VIEW — Minimal global styles
+   Most styles are now scoped inside Vue SFC <style scoped> blocks.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+#tpl-page { height: 100%; }
