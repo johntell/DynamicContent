@@ -2,14 +2,54 @@
 
 Generate on-brand banners across social formats from a single image asset. Configure text layers, focal points, and export as PNG or ZIP — all in the browser.
 
-## Quick start
+## Prerequisites
+
+You only need one thing installed on your computer: **Node.js** (version 18 or newer).
+
+### Installing Node.js
+
+1. Go to [https://nodejs.org](https://nodejs.org)
+2. Download the **LTS** (Long Term Support) version for your operating system
+3. Run the installer — accept the defaults, no custom options needed
+4. When it finishes, open a terminal to verify it worked:
+
+**Windows:** press `Win + R`, type `cmd`, press Enter
+**Mac:** open **Terminal** from Applications → Utilities
 
 ```bash
-npm install
-npm run dev
+node --version
+npm --version
 ```
 
-Open `http://localhost:5174` in your browser.
+Both commands should print a version number (e.g. `v20.11.0` and `10.2.0`). If they do, you're ready.
+
+> **Note:** `npm` (Node Package Manager) is included automatically when you install Node.js — no separate install needed.
+
+## Quick start
+
+1. **Download the project** — click the green **Code** button on GitHub, then **Download ZIP**. Extract it somewhere on your computer. Alternatively, if you have Git installed:
+   ```bash
+   git clone https://github.com/johntell/DynamicContent.git
+   ```
+
+2. **Open a terminal in the project folder:**
+   - **Windows:** open the extracted folder in File Explorer, click the address bar, type `cmd`, press Enter
+   - **Mac:** right-click the folder → **Open in Terminal**
+
+3. **Install dependencies** (first time only):
+   ```bash
+   npm install
+   ```
+   This downloads all the libraries the project needs. It may take a minute.
+
+4. **Start the app:**
+   ```bash
+   npm run dev
+   ```
+
+5. **Open your browser** and go to `http://localhost:5174`
+
+You should see the demo project with sample formats and assets loaded. To stop the app, press `Ctrl + C` in the terminal.
 
 ## What it does
 
@@ -72,11 +112,22 @@ Everything lives in `localStorage` under the key `tpl_builder_v8`. No backend, n
 
 ## Build for production
 
+If you want to deploy the app to a web server (so others can use it without installing anything):
+
 ```bash
 npm run build
 ```
 
-Output goes to `dist/`. Serve it with any static file server.
+This creates a `dist/` folder with static HTML, CSS, and JS files. Upload that folder to any web host (Netlify, Vercel, GitHub Pages, or any static file server).
+
+## Troubleshooting
+
+| Problem | Solution |
+|---|---|
+| `node` or `npm` not recognised | Node.js isn't installed or wasn't added to your PATH — reinstall from [nodejs.org](https://nodejs.org) |
+| `npm install` fails with permission errors | **Windows:** run the terminal as Administrator. **Mac:** prefix with `sudo npm install` |
+| Port 5174 already in use | Another app is using that port. Stop it, or run `npx vite --port 3000` to use a different port |
+| Blank page in browser | Make sure you're visiting `http://localhost:5174`, not `https://` |
 
 ## License
 
