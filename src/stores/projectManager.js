@@ -11,6 +11,43 @@ function generateId() {
   return Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 7);
 }
 
+// ── Default demo snapshot (first-time experience) ───────────────────────────
+
+const DEFAULT_SNAPSHOT = {
+  layers: [
+    { id: 'headline', type: 'headline', label: 'Headline', value: 'Aprimo DAM', mappedField: null, gapAfter: 20 },
+    { id: 'text', type: 'text', label: 'Text', value: 'Build dynamic content with CDN served assets.', mappedField: null, gapAfter: 12 },
+    { id: 'cta', type: 'cta', label: 'CTA', value: 'Have fun', mappedField: null, gapAfter: 12 },
+  ],
+  formats: [
+    { id: 'linkedin', label: 'LinkedIn / OG', w: 734, h: 221, anchor: 'tl', logoSize: 0, visibleLayers: ['headline', 'text', 'cta'], contentWidth: 31, contentScale: 1.2, ctaScale: 1, layerAnchors: { cta: 'br' }, assetAnchors: { mnobjoiv_il0ys: 'cl' } },
+    { id: 'ig-square', label: 'Instagram Square', w: 483, h: 903, anchor: 'tr', logoSize: 0.11, visibleLayers: ['headline', 'text', 'cta'], contentWidth: 68, contentScale: 1.26, layerAnchors: {}, assetAnchors: { mnobjoiv_il0ys: 'br' } },
+    { id: 'ig-story', label: 'Instagram Story', w: 512, h: 512, anchor: 'tr', logoSize: 0.1, visibleLayers: ['headline', 'text', 'cta'], contentWidth: 60, contentScale: 1.38, layerAnchors: {}, assetAnchors: { mnobjoiv_il0ys: 'tl', asset_mnobvu6k5f3: 'br' } },
+    { id: 'facebook', label: 'Facebook Post', w: 512, h: 360, anchor: 'tl', logoSize: 0.09, visibleLayers: ['headline', 'text', 'cta'], contentScale: 1.3, contentWidth: 45, layerAnchors: { cta: 'br' }, logoAnchor: 'bl' },
+    { id: 'rectangle', label: 'Display Rectangle', w: 261, h: 221, anchor: 'tc', logoSize: 0, visibleLayers: ['headline', 'cta'], ctaScale: 0.81, contentWidth: 100, contentScale: 1, layerAnchors: { cta: 'bc', text: 'bc' }, logoAnchor: '' },
+    { id: 'custom-312-1155-mnnlg83q', label: 'Custom 312×1155', w: 312, h: 1151, anchor: 'bc', layerAnchors: {}, logoAnchor: '', visibleLayers: ['headline', 'text', 'cta'], logoSize: 0.2, contentScale: 1.45, contentWidth: 100, padding: 10, ctaScale: 1.05 },
+  ],
+  styles: {
+    headlineFont: 'Playfair Display', headlineFontSize: 27, headlineFontWeight: '400', headlineColor: '#ffffff',
+    textFont: 'Plus Jakarta Sans', textFontSize: 14, textFontWeight: '400', textColor: '#ffffff',
+    ctaFont: 'Josefin Sans', ctaFontSize: 16, ctaFontWeight: '700', ctaTextColor: '#e2cd83',
+    accentColor: '#0e5700', ctaPadH: 20, ctaPadV: 10, ctaRadius: 24, contentGap: 12,
+    overlayColor: '#52430f', overlayOpacity: 0.58,
+    bgMode: 'radial', bgColor1: '#8ea989', bgColor2: '#4a7321', bgAngle: 180, bgDistance: 72,
+  },
+  assets: [
+    { id: 'mnobjoiv_il0ys', url: 'https://p3.aprimocdn.net/trial117/9a978ba1-55a8-42e8-818f-b37c00f1ddc0/PXL_20250825_190137159.MP_Original%20file.jpg', label: '', focalX: 0.534, focalY: 0.439, focalW: 0.466, focalH: 0.262, focalFit: 'cover', contentAwareFocal: false, useSmartCrop: false },
+    { id: 'asset_mnobnhjmfil', url: 'https://p3.aprimocdn.net/trial117/659dd6a4-8f19-48de-b95b-b42100a90322/560114-05543-o_eCom_Original%20file.png', label: '560114-05543-o_eCom.png', focalX: 0.5, focalY: 0.665, focalW: 1, focalH: 0.374, focalFit: 'safe', contentAwareFocal: false, useSmartCrop: false },
+  ],
+  activeAssetId: 'asset_mnobnhjmfil',
+  logoUrl: 'https://go.aprimo.com/hs-fs/hubfs/Aprimo%20Logos/Aprimo_Logo_RGB_White_png.png',
+  canvasPositions: {
+    linkedin: { x: 13, y: -50 }, rectangle: { x: 773, y: -50 },
+    'ig-story': { x: 13, y: 198 }, 'ig-square': { x: 551, y: 198 },
+    facebook: { x: 13, y: 741 }, 'custom-312-1155-mnnlg83q': { x: 1065, y: -50 },
+  },
+};
+
 // ── Store ────────────────────────────────────────────────────────────────────
 
 export const useProjectManagerStore = defineStore('projectManager', () => {
@@ -156,19 +193,20 @@ export const useProjectManagerStore = defineStore('projectManager', () => {
       return;
     }
 
-    // 4. Brand new — create a default project
+    // 4. Brand new — create a demo project with pre-configured snapshot
     const id = generateId();
     projects.value = {
       [id]: {
         id,
-        name: 'My Project',
+        name: 'Demo Project',
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
-        snapshot: null, // templateBuilder will populate on first save
+        snapshot: JSON.parse(JSON.stringify(DEFAULT_SNAPSHOT)),
       },
     };
     activeProjectId.value = id;
     projectOrder.value = [id];
+    saveEnvelope();
   }
 
   // ── Project CRUD ────────────────────────────────────────────────
